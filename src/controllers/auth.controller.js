@@ -1,3 +1,4 @@
+const { json } = require("express");
 const user=require("../models/User.model");
 const generateToken=require("../utils/generateToken");
 
@@ -19,3 +20,26 @@ exports.register=async(req,res)=>{
     res.status(500).json({error:error.message});
   }
 };
+
+//Login
+exports.login=async(req,res)=>{
+  try{
+    const{email,password}=req.body;
+    const user=await User.findone({email});
+    if(!user|| !(await user.matchPassword(password))){
+      return res.status(401).json({message:"Invalid email or passowrd"});
+}
+ res.json({
+    message:"Login sucessfully",
+    token:generateToken(user._id)
+  });
+  }catch(error){
+    res.status(500).json({error:error.message});
+  }
+ 
+};
+exports.profile=async(req,res)=>{
+  res.json(
+    req.user
+  )
+}
